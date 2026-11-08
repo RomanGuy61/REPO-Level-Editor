@@ -1,0 +1,10 @@
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.csproj.AssemblyReference.cache
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.GeneratedMSBuildEditorConfig.editorconfig
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.AssemblyInfoInputs.cache
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.AssemblyInfo.cs
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.csproj.CoreCompileInputs.cache
+/home/Roman-Fedora/Documents/REPOLevelEditor/bin/Release/netstandard2.1/REPOLevelEditor.deps.json
+/home/Roman-Fedora/Documents/REPOLevelEditor/bin/Release/netstandard2.1/REPOLevelEditor.dll
+/home/Roman-Fedora/Documents/REPOLevelEditor/bin/Release/netstandard2.1/REPOLevelEditor.pdb
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.dll
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.pdb
