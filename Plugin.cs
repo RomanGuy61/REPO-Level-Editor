@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using MenuLib;
 using UnityEngine;
@@ -23,11 +24,25 @@ namespace REPOLevelEditor
 
         public static string SelectedRepoLevel = null;
 
+        public static ConfigEntry<float> MainMenuButtonX;
+        public static ConfigEntry<float> MainMenuButtonY;
+        public static ConfigEntry<float> LobbyButtonX;
+        public static ConfigEntry<float> LobbyButtonY;
+        public static ConfigEntry<float> EditorMoveSpeed;
+        public static ConfigEntry<float> EditorFastSpeed;
+
         private LevelEditorManager manager;
 
         private void Awake()
         {
             Log = Logger;
+
+            MainMenuButtonX = Config.Bind("UI", "MainMenuButtonX", 0f, "Main menu button X position");
+            MainMenuButtonY = Config.Bind("UI", "MainMenuButtonY", 0f, "Main menu button Y position");
+            LobbyButtonX = Config.Bind("UI", "LobbyButtonX", 0f, "Lobby menu button X position");
+            LobbyButtonY = Config.Bind("UI", "LobbyButtonY", 0f, "Lobby menu button Y position");
+            EditorMoveSpeed = Config.Bind("Editor", "MoveSpeed", 10f, "Editor camera move speed");
+            EditorFastSpeed = Config.Bind("Editor", "FastSpeed", 25f, "Editor camera fast move speed");
             var go = new GameObject("REPOLevelEditorManager");
             DontDestroyOnLoad(go);
             manager = go.AddComponent<LevelEditorManager>();
@@ -36,7 +51,7 @@ namespace REPOLevelEditor
             {
                 MenuAPI.AddElementToMainMenu(parent =>
                 {
-                    MenuAPI.CreateREPOButton("Level Editor", () => manager.EnterEditor(), parent, Vector2.zero);
+                    MenuAPI.CreateREPOButton("Level Editor", () => manager.EnterEditor(), parent, new Vector2(MainMenuButtonX.Value, MainMenuButtonY.Value));
                 });
             }
             catch (Exception e)
@@ -48,8 +63,8 @@ namespace REPOLevelEditor
             {
                 MenuAPI.AddElementToLobbyMenu(parent =>
                 {
-                    MenuAPI.CreateREPOButton("Save Level to .repo", () => SaveLobbyLevel(), parent, Vector2.zero);
-                    MenuAPI.CreateREPOButton("Select Repo Level", () => ShowLevelSelection(), parent, Vector2.zero);
+                    MenuAPI.CreateREPOButton("Save Level to .repo", () => SaveLobbyLevel(), parent, new Vector2(LobbyButtonX.Value, LobbyButtonY.Value));
+                    MenuAPI.CreateREPOButton("Select Repo Level", () => ShowLevelSelection(), parent, new Vector2(LobbyButtonX.Value, LobbyButtonY.Value + 40f));
                 });
             }
             catch (Exception e)

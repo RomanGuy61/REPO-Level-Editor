@@ -8,3 +8,4 @@
 /home/Roman-Fedora/Documents/REPOLevelEditor/bin/Release/netstandard2.1/REPOLevelEditor.pdb
 /home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.dll
 /home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.pdb
+/home/Roman-Fedora/Documents/REPOLevelEditor/obj/Release/netstandard2.1/REPOLevelEditor.sourcelink.json

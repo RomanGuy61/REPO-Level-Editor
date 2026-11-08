@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("REPOLevelEditor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c517f92474325ea92a0b167a5f52861e7fa5b607")]
 [assembly: System.Reflection.AssemblyProductAttribute("REPOLevelEditor")]
 [assembly: System.Reflection.AssemblyTitleAttribute("REPOLevelEditor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

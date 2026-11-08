@@ -462,7 +462,9 @@ namespace REPOLevelEditor
             if (Input.GetKey(KeyCode.D)) move += right;
             if (Input.GetKey(KeyCode.Q)) move += Vector3.down;
             if (Input.GetKey(KeyCode.E)) move += Vector3.up;
-            camPosition += move * (Input.GetKey(KeyCode.LeftShift) ? 25f : 10f) * Time.deltaTime;
+            float moveSpeed = REPOLevelEditorPlugin.EditorMoveSpeed != null ? REPOLevelEditorPlugin.EditorMoveSpeed.Value : 10f;
+            float fastSpeed = REPOLevelEditorPlugin.EditorFastSpeed != null ? REPOLevelEditorPlugin.EditorFastSpeed.Value : 25f;
+            camPosition += move * (Input.GetKey(KeyCode.LeftShift) ? fastSpeed : moveSpeed) * Time.deltaTime;
             // zoom with scroll
             camPosition += forward * Input.GetAxis("Mouse ScrollWheel") * 20f;
 
