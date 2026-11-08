@@ -80,6 +80,7 @@ namespace REPOLevelEditor
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
+            REPOLevelEditorPlugin.Log.LogInfo("Scene loaded: " + scene.name);
             if (scene.name == "Reload")
             {
                 StartCoroutine(PlayLevelRoutine());
@@ -301,6 +302,7 @@ namespace REPOLevelEditor
 
         private IEnumerator PlayLevelRoutine()
         {
+            REPOLevelEditorPlugin.Log.LogInfo("PlayLevelRoutine start. Selected=" + REPOLevelEditorPlugin.SelectedRepoLevel);
             // sync selection from room property
             try
             {
@@ -320,13 +322,23 @@ namespace REPOLevelEditor
                 timeout -= Time.deltaTime;
                 yield return null;
             }
-            if (LevelGenerator.Instance == null || !LevelGenerator.Instance.Generated) yield break;
+            if (LevelGenerator.Instance == null || !LevelGenerator.Instance.Generated)
+            {
+                REPOLevelEditorPlugin.Log.LogWarning("LevelGenerator not ready/generated.");
+                yield break;
+            }
+            REPOLevelEditorPlugin.Log.LogInfo("LevelGenerator generated. File=" + file);
 
             string path = Path.Combine(REPOLevelEditorPlugin.GetLevelsDirectory(), file);
+            REPOLevelEditorPlugin.Log.LogInfo("Looking for file: " + path);
             if (!File.Exists(path))
             {
                 if (File.Exists(file)) path = file;
-                else yield break;
+                else
+                {
+                    REPOLevelEditorPlugin.Log.LogWarning("File not found: " + path);
+                    yield break;
+                }
             }
 
             string json = File.ReadAllText(path);
@@ -338,6 +350,65 @@ namespace REPOLevelEditor
             foreach (var v in FindObjectsOfType<ValuableObject>()) if (v != null && v.gameObject != null) Destroy(v.gameObject);
             foreach (var e in FindObjectsOfType<Enemy>()) if (e != null && e.gameObject != null) Destroy(e.gameObject);
             yield return null;
+
+            // Build prefab map for resolution
+            var prefabMap = new Dictionary<string, PrefabRef>();
+            var seen = new HashSet<string>();
+            if (RunManager.instance != null && RunManager.instance.levels != null)
+            {
+                foreach (var level in RunManager.instance.levels)
+                {
+                    if (level == null) continue;
+                    CollectRefs(level.StartRooms, seen, prefabMap);
+                    CollectRefs(level.ModulesNormal1, seen, prefabMap);
+                    CollectRefs(level.ModulesNormal2, seen, prefabMap);
+                    CollectRefs(level.ModulesNormal3, seen, prefabMap);
+                    CollectRefs(level.ModulesPassage1, seen, prefabMap);
+                    CollectRefs(level.ModulesPassage2, seen, prefabMap);
+                    CollectRefs(level.ModulesPassage3, seen, prefabMap);
+                    CollectRefs(level.ModulesDeadEnd1, seen, prefabMap);
+                    CollectRefs(level.ModulesDeadEnd2, seen, prefabMap);
+                    CollectRefs(level.ModulesDeadEnd3, seen, prefabMap);
+                    CollectRefs(level.ModulesExtraction1, seen, prefabMap);
+                    CollectRefs(level.ModulesExtraction2, seen, prefabMap);
+                    CollectRefs(level.ModulesExtraction3, seen, prefabMap);
+                    CollectRefs(level.ModulesMega1, seen, prefabMap);
+                    CollectRefs(level.ModulesMega2, seen, prefabMap);
+                    CollectRefs(level.ModulesMega3, seen, prefabMap);
+                    CollectRefs(level.ModulesSpecial, seen, prefabMap);
+                    if (level.ValuablePresets != null)
+                    {
+                        foreach (var vp in level.ValuablePresets)
+                        {
+                            if (vp == null) continue;
+                            CollectRefs(vp.tiny, seen, prefabMap);
+                            CollectRefs(vp.small, seen, prefabMap);
+                            CollectRefs(vp.medium, seen, prefabMap);
+                            CollectRefs(vp.big, seen, prefabMap);
+                            CollectRefs(vp.wide, seen, prefabMap);
+                            CollectRefs(vp.tall, seen, prefabMap);
+                            CollectRefs(vp.veryTall, seen, prefabMap);
+                        }
+                    }
+                }
+            }
+            string[] monsterNames = new string[] {
+                "Enemy - Animal","Enemy - Bang","Enemy - Bang Director","Enemy - Beamer",
+                "Enemy - Birthday boy","Enemy - Bomb Thrower","Enemy - Bowtie","Enemy - Ceiling Eye",
+                "Enemy - Duck","Enemy - Elsa","Enemy - Floater","Enemy - Gnome","Enemy - Gnome Director",
+                "Enemy - Head","Enemy - Head Grabber","Enemy - Heart Hugger","Enemy - Hidden",
+                "Enemy - Hunter","Enemy - Oogly","Enemy - Robe","Enemy - Runner","Enemy - Shadow",
+                "Enemy - Slow Mouth","Enemy - Slow Walker","Enemy - Snatcher","Enemy - Spinny",
+                "Enemy - Thin Man","Enemy - Tick","Enemy - Tick Heal Aura","Enemy - Tricycle",
+                "Enemy - Tumbler","Enemy - Upscream","Enemy - Valuable Thrower","Enemy - Virus"
+            };
+            foreach (var mn in monsterNames)
+            {
+                if (seen.Add("M:" + mn))
+                {
+                    prefabMap[mn] = CreateNameRef(mn);
+                }
+            }
 
             Transform parent = (LevelGenerator.Instance.LevelParent != null) ? LevelGenerator.Instance.LevelParent.transform : null;
 
@@ -360,8 +431,17 @@ namespace REPOLevelEditor
                 }
                 else
                 {
-                    GameObject prefab = Resources.Load<GameObject>(od.prefabName);
-                    if (prefab == null) continue;
+                    GameObject prefab = null;
+                    if (prefabMap.TryGetValue(od.prefabName, out var pr) && pr != null)
+                    {
+                        prefab = pr.Prefab;
+                    }
+                    if (prefab == null) prefab = Resources.Load<GameObject>(od.prefabName);
+                    if (prefab == null)
+                    {
+                        REPOLevelEditorPlugin.Log.LogWarning("Missing prefab: " + od.prefabName);
+                        continue;
+                    }
                     GameObject inst = Instantiate(prefab, new Vector3(od.px, od.py, od.pz), Quaternion.Euler(od.rx, od.ry, od.rz));
                     inst.name = od.prefabName + "(Clone)";
                     if (parent != null) inst.transform.SetParent(parent, true);
@@ -395,6 +475,19 @@ namespace REPOLevelEditor
             if (f1 != null) f1.SetValue(pr, name);
             if (f2 != null) f2.SetValue(pr, name);
             return pr;
+        }
+
+        private void CollectRefs(List<PrefabRef> list, HashSet<string> seen, Dictionary<string, PrefabRef> map)
+        {
+            if (list == null) return;
+            foreach (var pr in list)
+            {
+                if (pr == null || !pr.IsValid()) continue;
+                if (seen.Add(pr.PrefabName))
+                {
+                    map[pr.PrefabName] = pr;
+                }
+            }
         }
 
         private void AddValuableRefs(List<PrefabRef> list, HashSet<string> seen, List<PrefabRef> target)
